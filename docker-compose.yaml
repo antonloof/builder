@@ -1,0 +1,46 @@
+version: '2.0'
+services:
+  web:
+      container_name: web
+      build: .
+      ports:
+        - "80:80"
+      depends_on:
+        - api
+      volumes:
+      - web-files:/usr/share/nginx/html/front:ro
+      - static:/usr/share/nginx/html/static:ro
+
+  api:
+      container_name: api
+      build: ./api
+      volumes:
+      - ./api/api:/home/docker/app/api
+      - static:/home/docker/app/static
+      expose:
+        - 3031
+      depends_on:
+        - db
+  db:
+    container_name: db
+    image: "postgres:12.1"
+    expose:
+      - 5432
+    volumes:
+    - db-data:/var/lib/postgresql/data
+
+  front:
+    build: ./front
+    container_name: front
+    volumes:
+    - web-files:/home/docker/dist
+    - ./front:/home/docker/front
+    - empty:/home/docker/front/node_modules
+
+volumes:
+  db-data:
+  api:
+  front:
+  web-files:
+  empty:
+  static:
